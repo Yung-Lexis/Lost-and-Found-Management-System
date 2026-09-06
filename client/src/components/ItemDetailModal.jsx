@@ -15,10 +15,12 @@ import {
   RefreshCw,
   ArrowRight,
   Flame,
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function ItemDetailModal({
   itemId,
@@ -26,8 +28,10 @@ export default function ItemDetailModal({
   onOpenEdit,
   onOpenClaim,
   onItemDeleted,
-  onSelectMatchItem
+  onSelectMatchItem,
+  onPromptLogin
 }) {
+  const { isAuthenticated } = useAuth();
   const toast = useToast();
   const [item, setItem] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -68,6 +72,12 @@ export default function ItemDetailModal({
   }, [itemId]);
 
   const handleDelete = async () => {
+    if (!isAuthenticated) {
+      toast.warning('🔒 Staff login required to delete item reports.');
+      if (onPromptLogin) onPromptLogin();
+      return;
+    }
+
     try {
       setDeleting(true);
       const res = await api.deleteItem(itemId);
@@ -304,22 +314,32 @@ export default function ItemDetailModal({
               <button
                 className="btn btn-secondary"
                 onClick={() => {
+                  if (!isAuthenticated) {
+                    toast.warning('🔒 Staff login required to edit reports.');
+                    if (onPromptLogin) onPromptLogin();
+                    return;
+                  }
                   onOpenEdit(item);
                 }}
               >
-                <Edit3 size={16} />
-                <span>Edit Report</span>
+                {!isAuthenticated ? <Lock size={15} style={{ color: 'var(--primary)' }} /> : <Edit3 size={16} />}
+                <span>Edit Report {!isAuthenticated && '(Staff)'}</span>
               </button>
 
               {item.status !== 'claimed' && (
                 <button
                   className="btn btn-success"
                   onClick={() => {
+                    if (!isAuthenticated) {
+                      toast.warning('🔒 Staff login required to mark items returned/claimed.');
+                      if (onPromptLogin) onPromptLogin();
+                      return;
+                    }
                     onOpenClaim(item);
                   }}
                 >
-                  <CheckCircle2 size={16} />
-                  <span>Mark Returned / Claimed</span>
+                  {!isAuthenticated ? <Lock size={15} /> : <CheckCircle2 size={16} />}
+                  <span>Mark Returned / Claimed {!isAuthenticated && '(Staff)'}</span>
                 </button>
               )}
             </div>

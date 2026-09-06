@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import ItemsDirectory from './pages/ItemsDirectory';
+import ReportPage from './pages/ReportPage';
+import LoginPage from './pages/LoginPage';
 import ReportModal from './components/ReportModal';
 import ItemDetailModal from './components/ItemDetailModal';
 import EditItemModal from './components/EditItemModal';
@@ -96,6 +98,24 @@ function App() {
             onOpenReportModal={handleOpenReportModal}
           />
         )}
+
+        {currentView === 'report' && (
+          <ReportPage
+            key={`report-${refreshKey}`}
+            onSuccess={(createdItem) => {
+              handleReportSuccess(createdItem);
+              setCurrentView('items');
+            }}
+            onCancel={() => setCurrentView('dashboard')}
+          />
+        )}
+
+        {currentView === 'login' && (
+          <LoginPage
+            onSuccess={() => setCurrentView('dashboard')}
+            onCancel={() => setCurrentView('dashboard')}
+          />
+        )}
       </main>
 
       {/* Report Modal */}
@@ -116,6 +136,10 @@ function App() {
           onOpenClaim={handleOpenClaim}
           onItemDeleted={handleItemDeleted}
           onSelectMatchItem={(matchId) => setSelectedItemId(matchId)}
+          onPromptLogin={() => {
+            setSelectedItemId(null);
+            setCurrentView('login');
+          }}
         />
       )}
 

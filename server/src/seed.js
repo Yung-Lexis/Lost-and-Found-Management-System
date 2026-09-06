@@ -3,6 +3,7 @@ dotenv.config();
 
 const { connectDB, disconnectDB } = require('./config/db');
 const Item = require('./models/Item');
+const User = require('./models/User');
 
 const sampleItems = [
   {
@@ -135,6 +136,25 @@ const seedDB = async () => {
     console.log('Inserting sample seed items...');
     const inserted = await Item.insertMany(sampleItems);
     console.log(`✓ Seed successful! Inserted ${inserted.length} sample items.`);
+
+    console.log('Clearing existing users...');
+    await User.deleteMany({});
+    console.log('Inserting default staff and admin users...');
+    await User.create([
+      {
+        name: 'Sarah Connor (Admin)',
+        email: 'admin@findnest.com',
+        password: 'password123',
+        role: 'admin'
+      },
+      {
+        name: 'Officer Davis (Staff)',
+        email: 'staff@findnest.com',
+        password: 'password123',
+        role: 'staff'
+      }
+    ]);
+    console.log('✓ Default users created: admin@findnest.com / password123, staff@findnest.com / password123');
   } catch (err) {
     console.error('✗ Seed error:', err);
   } finally {

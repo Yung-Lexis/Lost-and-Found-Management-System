@@ -103,9 +103,20 @@ const runFullE2ETest = async () => {
     if (!match) throw new Error('Target found iPad not in match list');
     console.log(`✓ Smart Match Success! Score: ${match.score}% | Match reasons: ${match.reasons.join(', ')}`);
 
+    // Authenticate as Staff for protected management actions
+    const authRes = await makeRequest(`${baseUrl}/api/auth/register`, { method: 'POST' }, {
+      name: 'E2E Staff Member',
+      email: `e2e_${Date.now()}@campus.edu`,
+      password: 'password123'
+    });
+    const staffToken = authRes.body.token;
+
     // Step 6: Mark Item as Claimed / Returned
     console.log('\n[Step 6] Marking Lost & Found items as Claimed / Returned...');
-    const claimRes = await makeRequest(`${baseUrl}/api/items/${lostId}/status`, { method: 'PATCH' }, {
+    const claimRes = await makeRequest(`${baseUrl}/api/items/${lostId}/status`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${staffToken}` }
+    }, {
       status: 'claimed',
       claimedBy: 'Maya Patel',
       claimantContact: 'maya.p@university.edu',
@@ -130,7 +141,10 @@ const runFullE2ETest = async () => {
 
     // Step 8: Edit Report
     console.log('\n[Step 8] Testing Edit Item Report...');
-    const editRes = await makeRequest(`${baseUrl}/api/items/${foundId}`, { method: 'PUT' }, {
+    const editRes = await makeRequest(`${baseUrl}/api/items/${foundId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${staffToken}` }
+    }, {
       title: 'Found Apple iPad Air (Claim Handled at Front Desk)',
       location: 'Science Hall Front Desk'
     });
@@ -141,7 +155,10 @@ const runFullE2ETest = async () => {
 
     // Step 9: Delete / Archive Item
     console.log('\n[Step 9] Testing Delete Item Report...');
-    const deleteRes = await makeRequest(`${baseUrl}/api/items/${foundId}`, { method: 'DELETE' });
+    const deleteRes = await makeRequest(`${baseUrl}/api/items/${foundId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${staffToken}` }
+    });
     if (deleteRes.status !== 200) throw new Error('Failed to delete item');
     console.log('✓ Successfully deleted/archived item');
 

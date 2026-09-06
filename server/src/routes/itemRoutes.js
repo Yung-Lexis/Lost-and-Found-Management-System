@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { requireAuth } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const {
   createItem,
@@ -20,16 +21,17 @@ router.get('/:id/matches', getMatchesForItem);
 // GET /api/items/:id - Get single item
 router.get('/:id', getItemById);
 
-// POST /api/items - Create a new item report (with optional image file)
+// POST /api/items - Create a new item report (with optional image file - open to everyone)
 router.post('/', upload.single('image'), createItem);
 
+// Staff-only actions requiring authentication:
 // PUT /api/items/:id - Update item report
-router.put('/:id', upload.single('image'), updateItem);
+router.put('/:id', requireAuth, upload.single('image'), updateItem);
 
 // PATCH /api/items/:id/status - Update item status (lost, found, claimed)
-router.patch('/:id/status', updateItemStatus);
+router.patch('/:id/status', requireAuth, updateItemStatus);
 
 // DELETE /api/items/:id - Delete or archive item
-router.delete('/:id', deleteItem);
+router.delete('/:id', requireAuth, deleteItem);
 
 module.exports = router;
