@@ -77,7 +77,17 @@ const runTests = async () => {
       reporterContact: 'charlie@test.com'
     });
 
-    await makeRequest(`${baseUrl}/api/items/${claimedItem.body.data._id}/status`, { method: 'PATCH' }, {
+    const authRes = await makeRequest(`${baseUrl}/api/auth/register`, { method: 'POST' }, {
+      name: 'Stats Staff',
+      email: `stats_${Date.now()}@test.com`,
+      password: 'password123'
+    });
+    const staffToken = authRes.body.token;
+
+    await makeRequest(`${baseUrl}/api/items/${claimedItem.body.data._id}/status`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${staffToken}` }
+    }, {
       status: 'claimed',
       claimedBy: 'Dave Owner',
       claimantContact: 'dave@test.com',

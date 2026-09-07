@@ -44,12 +44,12 @@ const getDashboardSummary = async (req, res) => {
       ]),
       Item.find(baseQuery)
         .sort({ createdAt: -1 })
-        .limit(6)
-        .select('title type category location date status image createdAt'),
+        .limit(8)
+        .select('title type category location date status image reporterName createdAt'),
       Item.find({ ...baseQuery, status: 'claimed' })
         .sort({ 'claimDetails.claimedDate': -1, updatedAt: -1 })
-        .limit(5)
-        .select('title category location claimDetails updatedAt')
+        .limit(6)
+        .select('title type category location date status image claimDetails reporterName updatedAt createdAt')
     ]);
 
     const resolutionRate = totalCount > 0 
