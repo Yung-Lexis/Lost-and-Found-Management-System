@@ -43,7 +43,9 @@ export default function EditItemModal({ item, onClose, onSuccess }) {
     location: item?.location || '',
     date: item?.date ? new Date(item.date).toISOString().split('T')[0] : '',
     reporterName: item?.reporterName || '',
-    reporterContact: item?.reporterContact || ''
+    reporterContact: item?.reporterContact || '',
+    priority: item?.priority || 'medium',
+    tags: Array.isArray(item?.tags) ? item.tags.join(', ') : ''
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -111,6 +113,8 @@ export default function EditItemModal({ item, onClose, onSuccess }) {
       submissionData.append('date', formData.date);
       submissionData.append('reporterName', formData.reporterName.trim());
       submissionData.append('reporterContact', formData.reporterContact.trim());
+      submissionData.append('priority', formData.priority);
+      submissionData.append('tags', formData.tags.trim());
 
       if (imageFile) {
         submissionData.append('image', imageFile);
@@ -261,6 +265,40 @@ export default function EditItemModal({ item, onClose, onSuccess }) {
                 onChange={handleChange}
                 rows={3}
                 required
+              />
+            </div>
+
+            {/* Priority / Urgency */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-priority">
+                <span>Priority / Urgency</span>
+              </label>
+              <select
+                id="edit-priority"
+                name="priority"
+                className="form-control"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="low">Low Priority</option>
+                <option value="medium">Standard Priority</option>
+                <option value="high">High Urgency / Critical Item</option>
+              </select>
+            </div>
+
+            {/* Tags */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-tags">
+                <span>Tags / Keywords (comma separated)</span>
+              </label>
+              <input
+                id="edit-tags"
+                name="tags"
+                type="text"
+                className="form-control"
+                placeholder="e.g. wallet, leather, black, urgent"
+                value={formData.tags}
+                onChange={handleChange}
               />
             </div>
 

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import ItemsDirectory from './pages/ItemsDirectory';
 import ReportPage from './pages/ReportPage';
 import LoginPage from './pages/LoginPage';
+import ItemDetailPage from './pages/ItemDetailPage';
 import ReportModal from './components/ReportModal';
 import ItemDetailModal from './components/ItemDetailModal';
 import EditItemModal from './components/EditItemModal';
@@ -14,6 +15,7 @@ function App() {
   const [filterParams, setFilterParams] = useState({});
   const [reportModalType, setReportModalType] = useState(null); // 'lost' | 'found' | null
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [detailViewItemId, setDetailViewItemId] = useState(null); // Full-page detail view
   const [editingItem, setEditingItem] = useState(null);
   const [claimingItem, setClaimingItem] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -22,6 +24,7 @@ function App() {
 
   const handleNavigateToItems = (filters = {}) => {
     setFilterParams(filters);
+    setDetailViewItemId(null);
     setCurrentView('items');
   };
 
@@ -51,6 +54,11 @@ function App() {
       setSelectedItemId(null);
       setTimeout(() => setSelectedItemId(updatedItem._id), 50);
     }
+    // Also refresh the full detail page if it's showing the same item
+    if (detailViewItemId === updatedItem._id) {
+      setDetailViewItemId(null);
+      setTimeout(() => setDetailViewItemId(updatedItem._id), 50);
+    }
   };
 
   const handleOpenClaim = (item) => {
@@ -63,11 +71,22 @@ function App() {
       setSelectedItemId(null);
       setTimeout(() => setSelectedItemId(claimedItem._id), 50);
     }
+    if (detailViewItemId === claimedItem._id) {
+      setDetailViewItemId(null);
+      setTimeout(() => setDetailViewItemId(claimedItem._id), 50);
+    }
   };
 
   const handleItemDeleted = (deletedId) => {
     triggerRefresh();
     setSelectedItemId(null);
+    setDetailViewItemId(null);
+  };
+
+  const handleViewFullPage = (itemId) => {
+    setSelectedItemId(null); // Close the modal
+    setDetailViewItemId(itemId); // Open the full-page view
+    setCurrentView('item-detail');
   };
 
   return (
@@ -75,7 +94,10 @@ function App() {
       {/* Top Navigation */}
       <Navbar
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          setDetailViewItemId(null);
+          setCurrentView(view);
+        }}
         onOpenReportModal={handleOpenReportModal}
       />
 
@@ -116,6 +138,27 @@ function App() {
             onCancel={() => setCurrentView('dashboard')}
           />
         )}
+
+        {currentView === 'item-detail' && detailViewItemId && (
+          <ItemDetailPage
+            key={`detail-${detailViewItemId}-${refreshKey}`}
+            itemId={detailViewItemId}
+            onBack={() => {
+              setDetailViewItemId(null);
+              setCurrentView('items');
+            }}
+            onOpenEdit={handleOpenEdit}
+            onOpenClaim={handleOpenClaim}
+            onItemDeleted={handleItemDeleted}
+            onSelectMatchItem={(matchId) => {
+              setDetailViewItemId(matchId);
+            }}
+            onPromptLogin={() => {
+              setDetailViewItemId(null);
+              setCurrentView('login');
+            }}
+          />
+        )}
       </main>
 
       {/* Report Modal */}
@@ -140,6 +183,7 @@ function App() {
             setSelectedItemId(null);
             setCurrentView('login');
           }}
+          onViewFullPage={() => handleViewFullPage(selectedItemId)}
         />
       )}
 

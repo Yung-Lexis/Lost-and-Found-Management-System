@@ -14,9 +14,19 @@ const sampleItems = [
     location: 'Central Library, 2nd Floor Study Desk',
     date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
     status: 'lost',
+    priority: 'high',
+    tags: ['wallet', 'id card', 'license', 'urgent'],
     reporterName: 'Alex Morgan',
     reporterContact: 'alex.m@example.com / +1 (555) 234-5678',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Reported as lost item by Alex Morgan',
+        performedBy: 'Alex Morgan',
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',
@@ -31,9 +41,19 @@ const sampleItems = [
     location: 'Student Cafeteria near Vending Machines',
     date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
     status: 'found',
+    priority: 'high',
+    tags: ['airpods', 'apple', 'headphones', 'bluetooth'],
     reporterName: 'David Chen',
     reporterContact: 'david.chen@example.com',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Handed in as found item by David Chen',
+        performedBy: 'David Chen',
+        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',
@@ -48,9 +68,19 @@ const sampleItems = [
     location: 'North Parking Lot, Row C',
     date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     status: 'found',
+    priority: 'high',
+    tags: ['subaru', 'car keys', 'lanyard', 'urgent'],
     reporterName: 'Campus Security Office',
     reporterContact: 'security-desk@campus.edu',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Turned in to security desk by Campus Patrol',
+        performedBy: 'Officer Davis',
+        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',
@@ -65,9 +95,19 @@ const sampleItems = [
     location: 'Science Building Room 304',
     date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
     status: 'lost',
+    priority: 'medium',
+    tags: ['apple', 'charger', 'magsafe', 'macbook'],
     reporterName: 'Sarah Jenkins',
     reporterContact: 's.jenkins@example.org',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Reported as lost item by Sarah Jenkins',
+        performedBy: 'Sarah Jenkins',
+        timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',
@@ -82,9 +122,25 @@ const sampleItems = [
     location: 'Gymnasium Bleachers Section 2',
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
     status: 'claimed',
+    priority: 'low',
+    tags: ['hydro flask', 'water bottle', 'blue', 'stickers'],
     reporterName: 'Coach Martinez',
     reporterContact: 'gym-staff@example.com',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Found at gymnasium bleachers and turned in by Coach Martinez',
+        performedBy: 'Coach Martinez',
+        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+      },
+      {
+        action: 'Claimed',
+        description: 'Verified ownership via stickers and handed over to Jordan Reed',
+        performedBy: 'Staff Desk',
+        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: 'Jordan Reed',
       claimantContact: 'jordan.reed@example.com',
@@ -100,9 +156,19 @@ const sampleItems = [
     location: 'Campus Courtyard Coffee Shop',
     date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
     status: 'lost',
+    priority: 'medium',
+    tags: ['ray-ban', 'sunglasses', 'gold', 'leather case'],
     reporterName: 'Emily Watson',
     reporterContact: '+1 (555) 987-6543',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Reported lost by Emily Watson',
+        performedBy: 'Emily Watson',
+        timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',
@@ -117,9 +183,19 @@ const sampleItems = [
     location: 'Math Department Hallway Bench',
     date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     status: 'found',
+    priority: 'medium',
+    tags: ['calculator', 'ti-84', 'math', 'mint'],
     reporterName: 'Prof. Miller',
     reporterContact: 'pmiller@math.edu',
     image: '',
+    history: [
+      {
+        action: 'Reported',
+        description: 'Found outside lecture hall by Prof. Miller',
+        performedBy: 'Prof. Miller',
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      }
+    ],
     claimDetails: {
       claimedBy: '',
       claimantContact: '',

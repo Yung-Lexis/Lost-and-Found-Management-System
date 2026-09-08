@@ -72,26 +72,6 @@ export default function Navbar({ currentView, setCurrentView, onOpenReportModal 
 
         {/* Action Controls & Auth */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {/* Quick Report Actions — hidden when already on the Report page */}
-          {currentView !== 'report' && (
-            <div className="nav-actions">
-              <button
-                className="btn btn-lost btn-sm"
-                onClick={() => onOpenReportModal('lost')}
-              >
-                <HelpCircle size={16} />
-                <span>Report Lost</span>
-              </button>
-
-              <button
-                className="btn btn-found btn-sm"
-                onClick={() => onOpenReportModal('found')}
-              >
-                <PlusCircle size={16} />
-                <span>Report Found</span>
-              </button>
-            </div>
-          )}
 
           {/* User Auth Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderLeft: '1px solid var(--border-color)', paddingLeft: '0.75rem' }}>

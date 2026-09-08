@@ -166,6 +166,49 @@ const runFullE2ETest = async () => {
     if (checkGet.status !== 404) throw new Error('Deleted item should return 404');
     console.log('✓ Verified deleted item is no longer returned in active queries');
 
+    // Step 10: Verify Priority, Tags & History on Create
+    console.log('\n[Step 10] Verifying new fields: priority, tags, and history...');
+    const richItemPayload = {
+      title: 'Custom Mechanical Keyboard (Keychron Q1)',
+      type: 'found',
+      category: 'Electronics',
+      description: 'Found a compact mechanical keyboard with custom keycaps in the student lounge.',
+      location: 'Student Lounge',
+      date: new Date().toISOString(),
+      reporterName: 'Alex Kim',
+      reporterContact: 'alex.k@campus.edu',
+      priority: 'high',
+      tags: ['keyboard', 'mechanical', 'keychron']
+    };
+    const richRes = await makeRequest(`${baseUrl}/api/items`, { method: 'POST' }, richItemPayload);
+    if (richRes.status !== 201) throw new Error('Failed to create item with new fields');
+    const richItem = richRes.body.data;
+    if (richItem.priority !== 'high') throw new Error(`Expected priority=high, got ${richItem.priority}`);
+    if (!richItem.tags || richItem.tags.length !== 3) throw new Error(`Expected 3 tags, got ${richItem.tags?.length}`);
+    if (!richItem.history || richItem.history.length < 1) throw new Error('Expected at least one history entry on creation');
+    console.log(`✓ Priority: ${richItem.priority}, Tags: [${richItem.tags.join(', ')}]`);
+    console.log(`✓ History contains ${richItem.history.length} entry(ies): "${richItem.history[0].action}"`);
+
+    // Step 11: Verify history grows on status change
+    console.log('\n[Step 11] Verifying history tracks status changes...');
+    const statusRes = await makeRequest(`${baseUrl}/api/items/${richItem._id}/status`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${staffToken}` }
+    }, {
+      status: 'claimed',
+      claimedBy: 'Owner',
+      claimantContact: 'owner@email.com',
+      notes: 'Verified via serial number'
+    });
+    if (statusRes.status !== 200) throw new Error('Failed to update status');
+    const updatedRich = statusRes.body.data;
+    const historyAfter = updatedRich.history || [];
+    if (historyAfter.length < 2) throw new Error(`Expected at least 2 history entries after claim, got ${historyAfter.length}`);
+    const claimedEvent = historyAfter.find(e => e.action === 'Claimed');
+    if (!claimedEvent) throw new Error('No "Claimed" event found in history');
+    console.log(`✓ History now has ${historyAfter.length} entries`);
+    console.log(`✓ Claimed event found: "${claimedEvent.description}"`);
+
     console.log('\n====================================================');
     console.log('🎉 ALL END-TO-END SYSTEM TESTS PASSED PERFECTLY!');
     console.log('====================================================\n');

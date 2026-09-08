@@ -16,7 +16,10 @@ import {
   ArrowRight,
   Flame,
   Check,
-  Lock
+  Lock,
+  Clock,
+  Tag,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -29,7 +32,8 @@ export default function ItemDetailModal({
   onOpenClaim,
   onItemDeleted,
   onSelectMatchItem,
-  onPromptLogin
+  onPromptLogin,
+  onViewFullPage
 }) {
   const { isAuthenticated } = useAuth();
   const toast = useToast();
@@ -292,6 +296,13 @@ export default function ItemDetailModal({
                 {copied ? <Check size={15} style={{ color: 'var(--success)' }} /> : <Share2 size={15} />}
                 <span>{copied ? 'Copied Link!' : 'Share Info'}</span>
               </button>
+
+              {onViewFullPage && (
+                <button className="btn btn-primary btn-sm" onClick={onViewFullPage}>
+                  <ExternalLink size={15} />
+                  <span>View Full Page</span>
+                </button>
+              )}
 
               {confirmDelete ? (
                 <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>

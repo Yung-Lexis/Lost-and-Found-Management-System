@@ -19,7 +19,9 @@ const createItem = async (req, res) => {
       reporterContact,
       reporterEmail,
       reporterPhone,
-      status
+      status,
+      priority,
+      tags
     } = req.body;
 
     let imagePath = '';
@@ -31,6 +33,15 @@ const createItem = async (req, res) => {
 
     const itemStatus = status || (type === 'found' ? 'found' : 'lost');
 
+    let parsedTags = [];
+    if (Array.isArray(tags)) {
+      parsedTags = tags.map((t) => String(t).trim()).filter(Boolean);
+    } else if (typeof tags === 'string' && tags.trim()) {
+      parsedTags = tags.split(',').map((t) => t.trim()).filter(Boolean);
+    }
+
+    const reporter = reporterName?.trim() || 'Community Reporter';
+
     const newItem = new Item({
       title,
       type,
@@ -39,9 +50,19 @@ const createItem = async (req, res) => {
       location,
       date: date ? new Date(date) : new Date(),
       status: itemStatus,
-      reporterName,
+      priority: ['low', 'medium', 'high'].includes(priority) ? priority : 'medium',
+      tags: parsedTags,
+      reporterName: reporter,
       reporterContact: reporterContact || reporterPhone || reporterEmail,
-      image: imagePath
+      image: imagePath,
+      history: [
+        {
+          action: 'Reported',
+          description: `Item reported as ${type} by ${reporter}`,
+          performedBy: reporter,
+          timestamp: new Date()
+        }
+      ]
     });
 
     const savedItem = await newItem.save();
@@ -258,6 +279,8 @@ const updateItem = async (req, res) => {
       reporterName,
       reporterContact,
       status,
+      priority,
+      tags,
       image
     } = req.body;
 
@@ -270,12 +293,32 @@ const updateItem = async (req, res) => {
     if (reporterName !== undefined) existingItem.reporterName = reporterName;
     if (reporterContact !== undefined) existingItem.reporterContact = reporterContact;
     if (status !== undefined) existingItem.status = status;
+    if (priority !== undefined && ['low', 'medium', 'high'].includes(priority)) {
+      existingItem.priority = priority;
+    }
+    if (tags !== undefined) {
+      if (Array.isArray(tags)) {
+        existingItem.tags = tags.map((t) => String(t).trim()).filter(Boolean);
+      } else if (typeof tags === 'string') {
+        existingItem.tags = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      }
+    }
 
     if (req.file) {
       existingItem.image = `/uploads/${req.file.filename}`;
     } else if (image !== undefined) {
       existingItem.image = image;
     }
+
+    if (!Array.isArray(existingItem.history)) {
+      existingItem.history = [];
+    }
+    existingItem.history.push({
+      action: 'Updated',
+      description: 'Report details were updated',
+      performedBy: req.user?.name || 'Staff',
+      timestamp: new Date()
+    });
 
     const updatedItem = await existingItem.save();
 
@@ -335,7 +378,14 @@ const updateItemStatus = async (req, res) => {
       });
     }
 
+    const prevStatus = item.status;
     item.status = status.toLowerCase();
+
+    if (!Array.isArray(item.history)) {
+      item.history = [];
+    }
+
+    const updater = req.user?.name || 'Staff';
 
     if (item.status === 'claimed') {
       item.claimDetails = {
@@ -344,12 +394,24 @@ const updateItemStatus = async (req, res) => {
         claimedDate: new Date(),
         notes: notes || ''
       };
+      item.history.push({
+        action: 'Claimed',
+        description: `Marked as claimed & returned to ${claimedBy || 'verified owner'}`,
+        performedBy: updater,
+        timestamp: new Date()
+      });
     } else {
       item.claimDetails = {
         claimedBy: '',
         claimantContact: '',
         notes: ''
       };
+      item.history.push({
+        action: 'Status Changed',
+        description: `Status updated from ${prevStatus} to ${item.status}`,
+        performedBy: updater,
+        timestamp: new Date()
+      });
     }
 
     const updatedItem = await item.save();

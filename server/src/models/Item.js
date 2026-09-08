@@ -60,10 +60,41 @@ const ItemSchema = new mongoose.Schema(
       trim: true,
       maxlength: [120, 'Contact info cannot exceed 120 characters']
     },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+      index: true
+    },
+    tags: {
+      type: [String],
+      default: [],
+      index: true
+    },
     image: {
       type: String,
       default: ''
     },
+    history: [
+      {
+        action: {
+          type: String,
+          required: true
+        },
+        description: {
+          type: String,
+          required: true
+        },
+        performedBy: {
+          type: String,
+          default: 'Community Reporter'
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
     claimDetails: {
       claimedBy: {
         type: String,

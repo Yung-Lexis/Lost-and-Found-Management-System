@@ -43,7 +43,9 @@ export default function ReportModal({ initialType = 'lost', onClose, onSuccess }
     location: '',
     date: new Date().toISOString().split('T')[0],
     reporterName: '',
-    reporterContact: ''
+    reporterContact: '',
+    priority: 'medium',
+    tags: ''
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -140,6 +142,8 @@ export default function ReportModal({ initialType = 'lost', onClose, onSuccess }
       submissionData.append('date', formData.date);
       submissionData.append('reporterName', formData.reporterName.trim());
       submissionData.append('reporterContact', formData.reporterContact.trim());
+      submissionData.append('priority', formData.priority);
+      submissionData.append('tags', formData.tags.trim());
 
       if (imageFile) {
         submissionData.append('image', imageFile);
@@ -328,6 +332,40 @@ export default function ReportModal({ initialType = 'lost', onClose, onSuccess }
                 maxLength={1000}
                 rows={3}
                 required
+              />
+            </div>
+
+            {/* Priority / Urgency */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="priority">
+                <span>Priority / Urgency Level</span>
+              </label>
+              <select
+                id="priority"
+                name="priority"
+                className="form-control"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="low">Low Priority</option>
+                <option value="medium">Standard Priority</option>
+                <option value="high">High Urgency / Critical Item</option>
+              </select>
+            </div>
+
+            {/* Tags */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="tags">
+                <span>Tags / Keywords (comma separated)</span>
+              </label>
+              <input
+                id="tags"
+                name="tags"
+                type="text"
+                className="form-control"
+                placeholder="e.g., wallet, black, leather, student id"
+                value={formData.tags}
+                onChange={handleChange}
               />
             </div>
 
